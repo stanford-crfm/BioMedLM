@@ -32,7 +32,7 @@ datadir=data/$task
 outdir=runs/$task/GPT2
 mkdir -p $outdir
 python -m torch.distributed.launch --nproc_per_node={num_devices} --nnodes=1 --node_rank=0 \
-  run_multiple_choice.py --use_flash {use_flash} --tokenizer_name {tokenizer} --model_name_or_path \
+  run_multiple_choice.py --tokenizer_name stanford-crfm/pubmed_gpt_tokenizer --model_name_or_path \
   {checkpoint} --train_file data/medqa_usmle_hf/train.json --validation_file data/medqa_usmle_hf/dev.json \
   --test_file data/medqa_usmle_hf/test.json --do_train --do_eval --do_predict --per_device_train_batch_size \
   {train_per_device_batch_size} --per_device_eval_batch_size 1 --gradient_accumulation_steps {grad_accum} \
