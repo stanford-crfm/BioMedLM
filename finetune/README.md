@@ -25,8 +25,6 @@ python -m torch.distributed.launch --nproc_per_node=8 --nnodes=1 --node_rank=0 r
   --seed {seed} --run_name {name}
 ```
 
-```
-
 For MedQA-USMLE, go to `mc/` and run the following command:
 ```bash
 task=medqa_usmle_hf
