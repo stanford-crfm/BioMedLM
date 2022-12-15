@@ -43,6 +43,9 @@ python -m torch.distributed.launch --nproc_per_node={num_devices} --nnodes=1 --n
   --overwrite_output_dir 
 ```
 
+## NLG
+Go to `./textgen`.
+
 ### Usage (seq2seq tasks)
 Make sure the task dataset is in `./textgen/data`. See `MeQSum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files.
 
