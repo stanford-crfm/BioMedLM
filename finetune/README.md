@@ -42,3 +42,29 @@ python -m torch.distributed.launch --nproc_per_node={num_devices} --nnodes=1 --n
   --output_dir trash/ \
   --overwrite_output_dir 
 ```
+
+### Usage (seq2seq tasks)
+Make sure the task dataset is in `./textgen/data`. See `MeQSum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files.
+
+Go to `./textgen/gpt2`.
+To finetune, run:
+```
+python -m torch.distributed.launch --nproc_per_node=8 --nnodes=1 --node_rank=0 \
+  finetune_for_summarization.py --output_dir {run_dir} --model_name_or_path {checkpoint}
+  --tokenizer_name stanford-crfm/pubmed_gpt_tokenizer --per_device_train_batch_size 1 
+  --per_device_eval_batch_size 1 --save_strategy no --do_eval --train_data_file 
+  ../data/MeQSum/train.source --eval_data_file ../data/MeQSum/val.source --save_total_limit 2 
+  --overwrite_output_dir --gradient_accumulation_steps {grad_accum} --learning_rate {lr} 
+  --warmup_ratio 0.5 --weight_decay 0.0 --seed 7 --evaluation_strategy steps --eval_steps 200 
+  --bf16 --num_train_epochs {num_epochs} --logging_steps 100 --logging_first_step 
+```
+
+After finetuning, run generation on the test set by:
+
+```
+CUDA_VISIBLE_DEVICES=0 python -u run_generation_batch.py --fp16 --max_source_length -1 --length 400 --model_name_or_path={finetune_checkpoint} --num_return_sequences 5 --stop_token [SEP] --tokenizer_name={finetune_checkpoint} --task_mode=meqsum --control_mode=no --tuning_mode finetune --gen_dir gen_results__tgtlen400__no_repeat_ngram_size6 --batch_size 9 --temperature 1.0 --no_repeat_ngram_size 6 --length_penalty -0.5 --wandb_entity=None --wandb_project=None --wandb_run_name=None
+```
+
+
+### Acknowledgement
+The NLG part of the code was built on https://github.com/XiangLi1999/PrefixTuning
