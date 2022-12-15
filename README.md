@@ -5,7 +5,9 @@ Code used for pre-training and fine-tuning the [PubMed GPT 2.7B](https://hugging
 ### Links
 
 [Blog](https://crfm.stanford.edu/2022/12/15/pubmedgpt.html)
+
 [Model](https://huggingface.co/stanford-crfm/pubmedgpt/tree/main)
+
 [MosaicML Composer](https://github.com/mosaicml/composer)
 
 ### Example Usage
