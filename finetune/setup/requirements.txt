@@ -1,0 +1,7 @@
+datasets==2.6.1
+fairscale==0.4.12
+huggingface-hub==0.10.1
+rouge-score==0.0.4
+sacrebleu==2.0.0
+transformers==4.24.0
+wandb==0.13.5
