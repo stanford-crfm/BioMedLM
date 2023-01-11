@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-root = "data/mc"
+root = "data"
 os.system(f"mkdir -p {root}")
 
 
