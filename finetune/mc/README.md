@@ -1,4 +1,4 @@
-### Setting Up MedQA
+## Setting Up MedQA
 
 1.) Download data from [MedQA GitHub](https://github.com/jind11/MedQA)
 
