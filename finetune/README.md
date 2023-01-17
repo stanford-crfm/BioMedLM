@@ -9,7 +9,11 @@ pip install -r setup/requirements.txt
 ```
 
 ### Usage
-For PubMedQA, go to `seqcls/` and run the following command:
+
+Note we are not providing the data. Demo versions of the `.jsonl` files are presented to show expected format.
+There should be one json per line for each example in the respective data sets for these tasks.
+
+For PubMedQA and BioASQ, go to `seqcls/` and run the following command (change paths appropriately for task):
 ```bash
 task=pubmedqa_hf
 datadir=data/$task
@@ -24,6 +28,7 @@ python -m torch.distributed.launch --nproc_per_node=8 --nnodes=1 --node_rank=0 r
   {run_dir} --overwrite_output_dir --bf16
   --seed {seed} --run_name {name}
 ```
+
 
 For MedQA-USMLE, go to `mc/` and run the following command:
 ```bash
@@ -47,7 +52,7 @@ python -m torch.distributed.launch --nproc_per_node={num_devices} --nnodes=1 --n
 Go to `./textgen`.
 
 ### Usage (seq2seq tasks)
-Make sure the task dataset is in `./textgen/data`. See `MeQSum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files.
+Make sure the task dataset is in `./textgen/data`. See `meqsum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files.
 
 Go to `./textgen/gpt2`.
 To finetune, run:
@@ -56,7 +61,7 @@ python -m torch.distributed.launch --nproc_per_node=8 --nnodes=1 --node_rank=0 \
   finetune_for_summarization.py --output_dir {run_dir} --model_name_or_path {checkpoint}
   --tokenizer_name stanford-crfm/pubmed_gpt_tokenizer --per_device_train_batch_size 1 
   --per_device_eval_batch_size 1 --save_strategy no --do_eval --train_data_file 
-  ../data/MeQSum/train.source --eval_data_file ../data/MeQSum/val.source --save_total_limit 2 
+  data/meqsum/train.source --eval_data_file data/meqsum/val.source --save_total_limit 2 
   --overwrite_output_dir --gradient_accumulation_steps {grad_accum} --learning_rate {lr} 
   --warmup_ratio 0.5 --weight_decay 0.0 --seed 7 --evaluation_strategy steps --eval_steps 200 
   --bf16 --num_train_epochs {num_epochs} --logging_steps 100 --logging_first_step 
