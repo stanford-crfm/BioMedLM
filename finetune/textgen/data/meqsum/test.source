@@ -1,0 +1,1 @@
+The source text for an example. For instance this could be the full article that is supposed to be summarized. There should be one example per line. The corresponding train.target file would have the gold generations for each example. So the Nth line of this file would correspond to the Nth line of the *.target file.
