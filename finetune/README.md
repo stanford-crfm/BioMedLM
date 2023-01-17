@@ -52,7 +52,7 @@ python -m torch.distributed.launch --nproc_per_node={num_devices} --nnodes=1 --n
 Go to `./textgen`.
 
 ### Usage (seq2seq tasks)
-Make sure the task dataset is in `./textgen/data`. See `meqsum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files.
+Make sure the task dataset is in `./textgen/data`. See `meqsum` (a medical text simplification task) as an example. The dataset folder should have `<split>.source` and `<split>.target` files. The `.source` file should contain the original text in a one example per line format (e.g. the full original question from the user in the MeQSum task) and the `.target` file should contain the desired output in a one example per line format (e.g. the summarization of the question). This set up can be adapted for a new task. For instance you could place biomedical articles in the source files and then brief summaries in the target files.
 
 Go to `./textgen/gpt2`.
 To finetune, run:
