@@ -1334,7 +1334,7 @@ def main():
             max_target_length = 512
             # args.length = max_target_length
         elif args.task_mode == 'medparasimp' or args.task_mode == 'meqsum':
-            test_path = f"../data/{args.task_mode}/val.source"
+            test_path = f"data/{args.task_mode}/val.source"
             if args.max_source_length < 0:
                 max_source_length = 512
             else:
