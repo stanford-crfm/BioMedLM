@@ -1,6 +1,8 @@
-# pubmedgpt
+# BioMedLM
 
-Code used for pre-training and fine-tuning the [PubMed GPT 2.7B](https://huggingface.co/stanford-crfm/pubmedgpt) model.
+Code used for pre-training and fine-tuning the [BioMedLM](https://huggingface.co/stanford-crfm/pubmedgpt) model.
+
+Note: This model was previously known as PubMedGPT, but the NIH has asked us to change the name since they hold the trademark on "PubMed", so the new name is BioMedLM!
 
 ### Links
 
