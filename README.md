@@ -21,9 +21,9 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 device = torch.device("cuda")
 
-tokenizer = GPT2Tokenizer.from_pretrained("stanford-crfm/pubmed_gpt_tokenizer")
+tokenizer = GPT2Tokenizer.from_pretrained("stanford-crfm/BioMedLM")
 
-model = GPT2LMHeadModel.from_pretrained("stanford-crfm/pubmedgpt").to(device)
+model = GPT2LMHeadModel.from_pretrained("stanford-crfm/BioMedLM").to(device)
 
 input_ids = tokenizer.encode(
     "Photosynthesis is ", return_tensors="pt"
