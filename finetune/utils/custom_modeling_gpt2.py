@@ -256,7 +256,13 @@ class GPT2ForSequenceClassification(GPT2PreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
-        self.transformer = GPT2Model(config)
+        if config.use_flash:
+            print("GPT2ForSequenceClassification using Flash !!")
+            from .hf_flash_gpt_2 import GPT2FlashModel
+            self.transformer = GPT2FlashModel(config)
+        else:
+            self.transformer = GPT2Model(config)
+
         self.classifier = nn.Linear(config.n_embd, self.num_labels, bias=False)
 
         self.init_weights()

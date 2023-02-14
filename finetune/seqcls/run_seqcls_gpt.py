@@ -205,6 +205,9 @@ class ModelArguments:
             "with private models)."
         },
     )
+    use_flash: bool = field(
+        default=False, metadata={"help": "Use flash attention."}
+    )
 
 
 def main():
@@ -343,6 +346,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    config.use_flash = model_args.use_flash
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
