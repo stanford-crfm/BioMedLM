@@ -26,7 +26,7 @@ import json
 
 import sys
 
-sys.path.insert(0, "..")
+sys.path.insert(0, "../..")
 from utils.hf_flash_gpt_2 import GPT2FlashLMHeadModel
 
 @dataclass
