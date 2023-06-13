@@ -29,7 +29,7 @@ class LineByLineSumTextDataset(Dataset):
     """
 
     def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int, bos_tok:str, eos_tok:str,
-                 max_source_length:int, max_target_length:int, use_task_instruction:int=0, use_stream_mode:bool=True):
+                 max_source_length:int, max_target_length:int, seq_prefix:str="", no_sep:bool=False, use_task_instruction:int=0, use_stream_mode:bool=True):
         assert os.path.isfile(file_path), f"Input file path {file_path} not found"
         # Here, we do not cache the features, operating under the assumption
         # that we will soon use fast multithreaded tokenizers from the
@@ -56,6 +56,9 @@ class LineByLineSumTextDataset(Dataset):
         self.tokenizer = tokenizer
 
         self.use_stream_mode = use_stream_mode
+
+        self.seq_prefix = seq_prefix
+        self.no_sep = no_sep
 
         if self.use_stream_mode:
             return
@@ -142,7 +145,7 @@ class LineByLineSumTextDataset(Dataset):
             assert source_line, f"empty source line for index {index}"
             assert tgt_line, f"empty tgt line for index {index}"
 
-            source_line = self.instruction + source_line if self.instruction else source_line
+            source_line = self.instruction + source_line if self.instruction else self.seq_prefix + source_line
 
             src = self.tokenizer(source_line, add_special_tokens=True, truncation=True, max_length=self.max_source_length,
                                      is_split_into_words=False)['input_ids']
@@ -150,14 +153,19 @@ class LineByLineSumTextDataset(Dataset):
             tgt = self.tokenizer(tgt_line, add_special_tokens=True, truncation=True, max_length=self.max_target_length,
                                      is_split_into_words=False)['input_ids']
 
-            sent = src + [self.bos_idx] + tgt + [self.eos_idx]
-
-            sep_idx = sent.index(self.bos_idx) + 1
-
-            label = copy.deepcopy(sent)
-            label[:sep_idx] = [-100] * sep_idx
-            src_sent = sent[:sep_idx - 1]
-            tgt_sent = sent[sep_idx - 1:]
+            if self.no_sep:
+                sent = src + tgt + [self.eos_idx]
+                label = copy.deepcopy(sent)
+                label[:len(src)] = [-100] * len(src)
+                src_sent = sent[:len(src)]
+                tgt_sent = sent[len(src):]
+            else:
+                sent = src + [self.bos_idx] + tgt + [self.eos_idx]
+                sep_idx = sent.index(self.bos_idx) + 1
+                label = copy.deepcopy(sent)
+                label[:sep_idx] = [-100] * sep_idx
+                src_sent = sent[:sep_idx - 1]
+                tgt_sent = sent[sep_idx - 1:]
 
             return (torch.tensor(sent, dtype=torch.long),
                     torch.tensor(label, dtype=torch.long),
