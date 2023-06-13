@@ -20,6 +20,14 @@ from transformers import (
 from sum_data_collator import DataCollatorForSumLanguageModeling
 from sum_dataset import LineByLineSumTextDataset
 
+import torch.distributed as dist
+
+import json
+
+import sys
+
+sys.path.insert(0, "..")
+from utils.hf_flash_gpt_2 import GPT2FlashLMHeadModel
 
 @dataclass
 class ModelArguments:
@@ -56,13 +64,20 @@ class DataArguments:
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
     )
     max_source_length: Optional[int] = field(
-        default=512, metadata={"help": "the max source length of summarization data. "}
+        default=510, metadata={"help": "the max source length of summarization data. "}
     )
     train_max_target_length: Optional[int] = field(
         default=510, metadata={"help": "the max target length for training data. "}
     )
     eval_max_target_length: Optional[int] = field(
         default=510, metadata={"help": "the max target length for dev data. "}
+    )
+    seq_prefix: Optional[str] = field(
+        default="",
+        metadata={"help": "A string to begin every sequence with."},
+    )
+    no_sep: bool = field(
+        default=False, metadata={"help": "Don't use a separator token."}
     )
     block_size: int = field(
         default=-1,
@@ -89,11 +104,13 @@ def get_dataset(
     dataset = LineByLineSumTextDataset(
         tokenizer=tokenizer,
         file_path=file_path,
-        block_size=512,
+        block_size=1024,
         bos_tok=tokenizer.bos_token,
-        eos_tok=tokenizer.sep_token,
+        eos_tok=tokenizer.eos_token,
         max_source_length=max_source_length,
         max_target_length=max_target_length,
+        seq_prefix=args.seq_prefix,
+        no_sep=args.no_sep
     )
 
     return dataset
@@ -108,22 +125,16 @@ def finetune():
     # set up model
     config = AutoConfig.from_pretrained(model_args.model_name_or_path)
     print(config)
-    #config.reorder_and_upcast_attn = True
-    #config.scale_attn_by_inverse_layer_idx = True
     model = AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         config=config,
     )
-    initial_weights = f"{model_args.model_name_or_path}/pytorch_model.bin"
-    model.load_state_dict(torch.load(initial_weights, map_location=torch.device("cpu")))
     # set up tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name)
     # add extra pad token
     tokenizer.add_special_tokens({"pad_token": "[PAD]"})
     tokenizer.add_special_tokens({"bos_token": "<|startoftext|>"})
-    tokenizer.add_special_tokens({"sep_token": "[SEP]"})
-    #for x in range(1,10):
-        #tokenizer.add_token(f"<|prefix{x}|>")
+    tokenizer.add_special_tokens({"eos_token": "<|endoftext|>"})
     embedding_layer = model.resize_token_embeddings(len(tokenizer))
     # set up data collator
     data_collator = DataCollatorForSumLanguageModeling(tokenizer=tokenizer)
@@ -140,12 +151,10 @@ def finetune():
         data_collator=data_collator
     )
     # launch fine tuning
-    #trainer.train(resume_from_checkpoint=f"{model_args.model_name_or_path}")
     trainer.train()
     # save final model
     trainer.save_model()
     trainer.save_state()
-
 
 if __name__ == "__main__":
     finetune()
