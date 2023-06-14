@@ -27,7 +27,6 @@ import json
 import sys
 
 sys.path.insert(0, "../..")
-from utils.hf_flash_gpt_2 import GPT2FlashLMHeadModel
 
 @dataclass
 class ModelArguments:
@@ -49,6 +48,9 @@ class ModelArguments:
         default="gpt2", metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
 
+    use_flash: bool = field(
+        default=False, metadata={"help": "Use flash attention."}
+    )
 
 @dataclass
 class DataArguments:
@@ -124,11 +126,17 @@ def finetune():
     set_seed(training_args.seed)
     # set up model
     config = AutoConfig.from_pretrained(model_args.model_name_or_path)
-    print(config)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_args.model_name_or_path,
-        config=config,
-    )
+    if model_args.use_flash:
+        from utils.hf_flash_gpt_2 import GPT2FlashLMHeadModel
+        model = GPT2FlashLMHeadModel.from_pretrained(
+            model_args.model_name_or_path,
+            config=config,
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_args.model_name_or_path,
+            config=config,
+        )
     # set up tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name)
     # add extra pad token
