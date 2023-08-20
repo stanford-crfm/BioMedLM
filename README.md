@@ -6,7 +6,7 @@ Note: This model was previously known as PubMedGPT, but the NIH has asked us to 
 
 ### Links
 
-[Blog](https://crfm.stanford.edu/2022/12/15/pubmedgpt.html)
+[Blog](https://crfm.stanford.edu/2022/12/15/biomedlm.html)
 
 [Model](https://huggingface.co/stanford-crfm/pubmedgpt/tree/main)
 
